@@ -6,4 +6,8 @@
     <RootNamespace>Alan___Terminal</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="forestpeas.WebSocketClient" Version="1.0.0" />
+  </ItemGroup>
+
 </Project>
