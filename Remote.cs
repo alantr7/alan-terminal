@@ -10,11 +10,12 @@ namespace Alan___Terminal {
         static string ip;
         public static async Task Connect(string _ip, string _mac) {
             ip = _ip;
+            Program.Print("IP: " + _ip);
             using (var client = await WsClient.ConnectAsync(new Uri("ws://" + ip))) {
                 Program.Print("Uspjesno povezan.\n");
-                Listen(client);
+                _ = Listen(client);
                 while (true) {
-                    Console.Write($"  {Program.PUBLIC_IP}@{_mac} $ ");
+                    Program.Print($"§a{Program.PUBLIC_IP}§8@§c{_mac} §f$ ", true, false);
                     string Input = Console.ReadLine();
 
                     string[] Arg = Program.LineToArgs(Input);
@@ -32,7 +33,7 @@ namespace Alan___Terminal {
         private static async Task Listen(WsClient ws) {
             while (true) {
                 string r = await ws.ReceiveStringAsync();
-                Program.Print(r);
+                //Program.Print(r);
             }
         }
 

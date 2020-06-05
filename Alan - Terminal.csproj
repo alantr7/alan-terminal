@@ -3,11 +3,18 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>Alan___Terminal</RootNamespace>
+    <RootNamespace>AlanTerminal</RootNamespace>
+    <AssemblyName>alan-terminal</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="forestpeas.WebSocketClient" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="alan-encoder">
+      <HintPath>..\Alan - Encoder\bin\Debug\alan-encoder.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

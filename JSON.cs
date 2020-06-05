@@ -132,7 +132,11 @@ namespace Alan {
                 s = s.Substring(0, s.Length - 2);
                 s += "}";
             }
-            else s += root.v;
+            else {
+                if (root.v is int || root.v is bool)
+                    s += root.v;
+                else s += "\"" + root.v + "\"";
+            }
 
             return s;
         }

@@ -1,5 +1,6 @@
 ﻿using Alan;
 using Alan___Terminal.commands;
+using AlanEncoder;
 using forestpeas.WebSocketClient;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace Alan___Terminal {
     class Program {
 
-        public static string PUBLIC_IP;
+        public static string PUBLIC_IP, DIRECTORY = Environment.GetEnvironmentVariable("APPDATA") + "\\Alan\\terminal\\";
 
         public static Dictionary<string, Command> commands = new Dictionary<string, Command>();
 
@@ -18,6 +19,9 @@ namespace Alan___Terminal {
             Command.CreateCommands();
 
             if (args.Length == 0) {
+                Console.WriteLine("$ help\n");
+                Answer(new string[] { "help" });
+                Console.WriteLine();
                 while (true) {
                     Console.Write("$ ");
 
@@ -45,6 +49,13 @@ namespace Alan___Terminal {
             }
         }
 
+        public static int[] GetCursorPosition() {
+            return new int[] { Console.CursorLeft, Console.CursorTop };
+        }
+        public static void SetCursorPosition(int[] pos) {
+            Console.SetCursorPosition(pos[0], pos[1]);
+        }
+
         public static string IPv4() {
             foreach (var ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList) {
                 if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork) {
@@ -59,8 +70,9 @@ namespace Alan___Terminal {
 
             string arg = "";
             bool Quoted = false;
-            foreach (char c in Line) {
-                if (c == '"') {
+            for (int i = 0; i < Line.Length; i++) {
+                char c = Line[i];
+                if ((c == '"' && i == 0) || (c == '"' && i > 0 && Line[i - 1] != '\\')) {
                     Quoted = !Quoted;
                     continue;
                 }
@@ -72,7 +84,11 @@ namespace Alan___Terminal {
                     continue;
                 }
 
-                arg += c;
+                if (c == '\\' && i > 0 && Line[i - 1] == '\\') {
+                    arg += c;
+                    Console.WriteLine("YEAH! c = " + c + " and " + Line[i - 1] + " = \\");
+                }
+                else if (c != '\\') arg += c;
             }
             if (arg.Length > 0) InputArgs.Add(arg);
 
@@ -102,18 +118,40 @@ namespace Alan___Terminal {
                     }
                 }
                 Print("Nepoznata komanda > help");
-            } catch {
+            } catch (Exception e) {
                 Print("Doslo je do greske prilikom izvrsavanja komande");
+                Print(e.Message);
             }
         }
 
-        public static void Print(string Line = "") {
+        public static void Print(string Line = "", bool printtime = true, bool newline = true) {
             if (Line.Length == 0) {
                 Console.WriteLine();
                 return;
             }
-            Console.WriteLine("  [ " + DateTime.Now.ToString("hh:mm:ss") + " ] " + Line);
-        }
+            if (printtime)
+                Line = $"  §8[ {DateTime.Now.ToString("hh:mm:ss")} ] §f{Line}";
 
+            for (int i = 0; i < Line.Length; i++) {
+                if (Line[i] == '§') {
+                    if (i + 1 >= Line.Length) break;
+                    char colorChar = Line[i + 1];
+
+                    if (Char.IsDigit(colorChar))
+                        Console.ForegroundColor = (ConsoleColor)Int32.Parse(colorChar + "");
+                    else Console.ForegroundColor = (ConsoleColor)(byte)colorChar - 87;
+                    i += 1;
+                }
+                else Console.Write(Line[i]);
+            };
+            if (newline) Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+        public static void EmptyLine(int[] cp) {
+            SetCursorPosition(cp);
+            string line = "";
+            for (int i = 0; i < 200; i++) line += " ";
+            Console.WriteLine(line);
+        }
     }
 }
